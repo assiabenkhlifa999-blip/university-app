@@ -1,9 +1,9 @@
 
-
 import { useState } from "react";
 
-function StudentCard(props) {
-  const [coordonneesVisibles, setCoordonneesVisibles] = useState(false);
+function StudentCard({ etudiant, onModifier, onSupprimer }) {
+  const [coordonneesVisibles, setCoordonneesVisibles] =
+    useState(false);
 
   function basculerInformations() {
     setCoordonneesVisibles(!coordonneesVisibles);
@@ -11,15 +11,31 @@ function StudentCard(props) {
 
   return (
     <div className="card">
-      <h2>{props.prenom} {props.nom}</h2>
+      {etudiant.image && (
+        <img
+          src={etudiant.image}
+          alt="Photo étudiant"
+          width="100"
+        />
+      )}
 
-      <p><strong>Filière :</strong> {props.filiere}</p>
+      <h2>{etudiant.prenom} {etudiant.nom}</h2>
 
-      <p><strong>Année :</strong> {props.anneeEtude}</p>
+      <p>
+        <strong>Filière :</strong> {etudiant.filiere}
+      </p>
 
-      <p><strong>Groupe :</strong> {props.groupe}</p>
+      <p>
+        <strong>Année :</strong> {etudiant.anneeEtude}
+      </p>
 
-      <p><strong>Ville :</strong> {props.ville}</p>
+      <p>
+        <strong>Groupe :</strong> {etudiant.groupe}
+      </p>
+
+      <p>
+        <strong>Ville :</strong> {etudiant.ville}
+      </p>
 
       <button onClick={basculerInformations}>
         {coordonneesVisibles
@@ -29,16 +45,21 @@ function StudentCard(props) {
 
       {coordonneesVisibles && (
         <div>
-          <p><strong>Email :</strong> {props.email}</p>
-          <p><strong>Téléphone :</strong> {props.telephone}</p>
+          <p>
+            <strong>Email :</strong> {etudiant.email}
+          </p>
+
+          <p>
+            <strong>Téléphone :</strong> {etudiant.telephone}
+          </p>
         </div>
       )}
 
-      <button onClick={() => props.onModifier(props.id)}>
+      <button onClick={() => onModifier(etudiant)}>
         Modifier
       </button>
 
-      <button onClick={() => props.onSupprimer(props.id)}>
+      <button onClick={() => onSupprimer(etudiant.id)}>
         Supprimer
       </button>
     </div>

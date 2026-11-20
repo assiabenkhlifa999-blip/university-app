@@ -1,11 +1,11 @@
 
 import { useState } from "react";
-import "./App.css";
-
+import StudentForm from "./components/StudentForm";
+import StudentCard from "./components/StudentCard";
 import Header from "./components/Header";
 import Navbar from "./components/Navbar";
-import StudentCard from "./components/StudentCard";
 import Footer from "./components/Footer";
+import "./App.css";
 
 const etudiantsInitial = [
   {
@@ -17,7 +17,8 @@ const etudiantsInitial = [
     filiere: "Génie Logiciel et Systèmes d'Information",
     anneeEtude: "2ème année",
     groupe: "GLSI 2",
-    ville: "Mahdia"
+    ville: "Mahdia",
+    image: "",
   },
   {
     id: "sarra@gmail.com",
@@ -28,140 +29,104 @@ const etudiantsInitial = [
     filiere: "Génie Logiciel et Systèmes d'Information",
     anneeEtude: "2ème année",
     groupe: "GLSI 2",
-    ville: "Sousse"
+    ville: "Sousse",
+    image: "",
   },
   {
-    id: "mariem@gmail.com",
-    prenom: "Mariem",
-    nom: "Khalfallah",
-    email: "mariem@gmail.com",
-    telephone: "+216 27 567 890",
+    id: "morneguirania@gmail.com",
+    prenom: "rania",
+    nom: "mornagui",
+    email: "morneguirania@gmail.com",
+    telephone: "+216 21 442 341",
     filiere: "Génie Logiciel et Systèmes d'Information",
     anneeEtude: "2ème année",
-    groupe: "GLSI 2",
-    ville: "Monastir"
-  }
+    groupe: "IRS2",
+    ville: "nabeul",
+    image: "",
+  },
 ];
 
 function App() {
   const [etudiants, setEtudiants] = useState(etudiantsInitial);
   const [recherche, setRecherche] = useState("");
+  const [etudiantAModifier, setEtudiantAModifier] = useState(null);
 
-  // Ajouter un étudiant
-  function ajouterEtudiant() {
-    const prenom = prompt("Donner le prénom :");
-    if (prenom === null || !prenom.trim()) return;
-
-    const nom = prompt("Donner le nom :");
-    if (nom === null || !nom.trim()) return;
-
-    const email = prompt("Donner l'email :");
-    if (email === null || !email.trim()) return;
-
-    const telephone = prompt("Donner le téléphone :");
-    if (telephone === null || !telephone.trim()) return;
-
-    const filiere = prompt("Donner la filière :");
-    if (filiere === null || !filiere.trim()) return;
-
-    const anneeEtude = prompt("Donner l'année d'étude :");
-    if (anneeEtude === null || !anneeEtude.trim()) return;
-
-    const groupe = prompt("Donner le groupe :");
-    if (groupe === null || !groupe.trim()) return;
-
-    const ville = prompt("Donner la ville :");
-    if (ville === null || !ville.trim()) return;
-
-    const nouvelEtudiant = {
-      id: email.trim(),
-      prenom: prenom.trim(),
-      nom: nom.trim(),
-      email: email.trim(),
-      telephone: telephone.trim(),
-      filiere: filiere.trim(),
-      anneeEtude: anneeEtude.trim(),
-      groupe: groupe.trim(),
-      ville: ville.trim()
-    };
-
-    if (etudiants.some(e => e.id === nouvelEtudiant.id)) {
-      alert("Cet email existe déjà !");
-      return;
-    }
-
-    setEtudiants(anciensEtudiants => [
-      ...anciensEtudiants,
-      nouvelEtudiant
+  function ajouterEtudiant(nouvelEtudiant) {
+    setEtudiants((anciens) => [
+      ...anciens,
+      { ...nouvelEtudiant, id: Date.now() },
     ]);
   }
 
-  // Supprimer un étudiant
-  function supprimerEtudiant(id) {
-    setEtudiants(anciensEtudiants =>
-      anciensEtudiants.filter(etudiant => etudiant.id !== id)
-    );
+  function modifierEtudiant(etudiant) {
+    setEtudiantAModifier(etudiant);
   }
 
-  // Modifier le prénom d'un étudiant
-  function modifierEtudiant(id) {
-    const nouveauPrenom = prompt("Donner le nouveau prénom :");
-
-    if (nouveauPrenom === null || !nouveauPrenom.trim()) {
-      return;
-    }
-
-    setEtudiants(anciensEtudiants =>
-      anciensEtudiants.map(etudiant =>
-        etudiant.id === id
-          ? { ...etudiant, prenom: nouveauPrenom.trim() }
+  function enregistrerModification(etudiantModifie) {
+    setEtudiants((anciens) =>
+      anciens.map((etudiant) =>
+        etudiant.id === etudiantAModifier.id
+          ? { ...etudiantModifie, id: etudiant.id }
           : etudiant
       )
     );
+    setEtudiantAModifier(null);
   }
 
-  // Filtrer les étudiants selon leur filière
-  const etudiantsFiltres = etudiants.filter(etudiant =>
-    etudiant.filiere.toLowerCase().includes(recherche.toLowerCase())
+  function supprimerEtudiant(id) {
+    setEtudiants((anciens) =>
+      anciens.filter((etudiant) => etudiant.id !== id)
+    );
+    if (etudiantAModifier?.id === id) {
+      setEtudiantAModifier(null);
+    }
+  }
+
+  const etudiantsFiltres = etudiants.filter((etudiant) =>
+    `${etudiant.nom} ${etudiant.prenom}`
+      .toLowerCase()
+      .includes(recherche.toLowerCase())
   );
 
   return (
     <div id="accueil">
       <Header />
-
       <Navbar />
 
       <main className="container" id="etudiants">
-        <h1>Liste des étudiants</h1>
+        <h1>Gestion des étudiants</h1>
 
-        <button onClick={ajouterEtudiant}>
-          Ajouter un étudiant
-        </button>
+        <StudentForm
+          key={etudiantAModifier ? etudiantAModifier.id : "nouveau"}
+          onAjouterEtudiant={ajouterEtudiant}
+          etudiantAModifier={etudiantAModifier}
+          onModifierEtudiant={enregistrerModification}
+        />
 
-        <br />
-        <br />
+        <h2>Liste des étudiants</h2>
 
         <input
           type="text"
-          placeholder="Rechercher par filière..."
+          placeholder="Rechercher un étudiant..."
           value={recherche}
-          onChange={e => setRecherche(e.target.value)}
+          onChange={(e) => setRecherche(e.target.value)}
         />
 
         <div className="students">
-          {etudiantsFiltres.map(etudiant => (
+          {etudiantsFiltres.map((etudiant) => (
             <StudentCard
               key={etudiant.id}
               {...etudiant}
-              onSupprimer={supprimerEtudiant}
+              etudiant={etudiant}
               onModifier={modifierEtudiant}
+              onSupprimer={supprimerEtudiant}
             />
           ))}
-        </div>
 
-        {etudiantsFiltres.length === 0 && (
-          <p>Aucun étudiant trouvé.</p>
-        )}
+          {etudiantsFiltres.length === 0 && (
+            <p>Aucun étudiant trouvé.</p>
+          )}
+        </div>
       </main>
 
       <Footer />
